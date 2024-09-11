@@ -1,0 +1,51 @@
+echo ^
+"name: React App CI/CD\n" ^
+"\n" ^
+"on:\n" ^
+"  push:\n" ^
+"    branches:\n" ^
+"      - main\n" ^
+"  pull_request:\n" ^
+"    branches:\n" ^
+"      - main\n" ^
+"\n" ^
+"jobs:\n" ^
+"  build-and-test:\n" ^
+"    runs-on: ubuntu-latest\n" ^
+"\n" ^
+"    steps:\n" ^
+"    - uses: actions/checkout@v3\n" ^
+"    - name: Set up Node.js\n" ^
+"      uses: actions/setup-node@v3\n" ^
+"      with:\n" ^
+"        node-version: '16' # 適宜変更\n" ^
+"    - name: Install dependencies\n" ^
+"      run: npm install\n" ^
+"    - name: Run unit tests\n" ^
+"      run: npm run test -- --watchAll=false --coverage\n" ^
+"      working-directory: ./src\n" ^
+"    - name: Build React application\n" ^
+"      run: npm run build\n" ^
+"    - name: Upload build artifacts\n" ^
+"      uses: actions/upload-artifact@v3\n" ^
+"      with:\n" ^
+"        name: react-build\n" ^
+"        path: build\n" ^
+"\n" ^
+"  deploy:\n" ^
+"    needs: build-and-test\n" ^
+"    runs-on: ubuntu-latest\n" ^
+"    environment: production\n" ^
+"    if: github.ref == 'refs/heads/main'\n" ^
+"\n" ^
+"    steps:\n" ^
+"    - uses: actions/checkout@v3\n" ^
+"    - name: Download build artifacts\n" ^
+"      uses: actions/download-artifact@v3\n" ^
+"      with:\n" ^
+"        name: react-build\n" ^
+"    - name: Deploy to GitHub Pages\n" ^
+"      uses: peaceiris/actions-gh-pages@v3\n" ^
+"      with:\n" ^
+"        github_token: ${{ secrets.GITHUB_TOKEN }}\n" ^
+"        publish_dir: ./build" > .github\workflows\react-ci-cd.yml
